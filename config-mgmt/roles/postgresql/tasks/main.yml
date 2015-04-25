@@ -1,0 +1,71 @@
+---
+
+- name: PostgreSQL | Install
+  pkgng: name={{item}} state=present
+  sudo: true
+  with_items:
+    - databases/postgresql94-server
+    - databases/postgresql94-client
+    - databases/postgresql94-contrib
+
+- name: PostgreSQL | Enable
+  sysrc:
+    name: postgresql_enable
+    state: present
+    value: "YES"
+  sudo: true
+
+- name: PostgreSQL | Configure data directory
+  sysrc:
+    name: postgresql_data
+    state: present
+    value: "/data/pgsql"
+  sudo: true
+
+- name: PostgreSQL | Check data directory state
+  shell: ls /data/pgsql
+  register: pgdata_check
+  sudo: true
+  ignore_errors: true
+
+- name: PostgreSQL | Create data folder
+  file: path=/data/pgsql state=directory owner=pgsql
+  sudo: true
+  when: pgdata_check.rc == 1
+
+- name: PostgreSQL | Initdb
+  shell: sudo /usr/local/etc/rc.d/postgresql initdb
+  sudo: true
+  when: pgdata_check.rc == 1
+
+- name: PostgreSQL | Config file | pg_hba.conf
+  template:
+    src: pg_hba.conf.j2
+    dest: /data/pgsql/pg_hba.conf
+    owner: pgsql
+    mode: 0644
+  sudo: true
+
+- name: PostgreSQL | Config file | postgresql.conf
+  template:
+    src: postgresql.conf.j2
+    dest: /data/pgsql/postgresql.conf
+    owner: pgsql
+    mode: 0644
+  sudo: true
+
+- name: PostgreSQL | Start
+  service: name=postgresql state=started
+  sudo: true
+
+- name: PostgreSQL | Create user
+  shell: psql -U pgsql -d postgres -c "CREATE ROLE {{ postgresql_username }} WITH CREATEDB LOGIN PASSWORD '{{ postgresql_password }}';"
+  sudo: true
+  ignore_errors: true # if it already exists, were are all good
+  when: (postgresql_password is defined) and (postgresql_username is defined)
+
+- name: PostgreSQL | Create user database
+  shell: psql -U pgsql -d postgres -c "CREATE DATABASE {{ postgresql_username }} WITH OWNER {{ postgresql_username }};"
+  sudo: true
+  ignore_errors: true # if it already exists, were are all good
+  when: (postgresql_password is defined) and (postgresql_username is defined)

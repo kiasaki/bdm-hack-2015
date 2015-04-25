@@ -1,0 +1,9 @@
+---
+
+- name: Install node
+  pkgng: name=www/node state=present
+  sudo: true
+
+- name: Install npm
+  pkgng: name=www/npm state=present
+  sudo: true

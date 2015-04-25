@@ -1,0 +1,11 @@
+- hosts: all
+  vars:
+    - instance_hostname: "{{ ansible_hostname }}"
+  roles:
+    - common
+
+- hosts: bdmhack-workbench
+  tasks:
+    - name: Install jq
+      pkgng: name=jq state=present
+      sudo: true

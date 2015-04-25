@@ -1,0 +1,44 @@
+- name: Update package catalog
+  shell: pkg update
+  sudo: true
+
+- name: Setup hostname if instance_hostname is defined
+  sysrc:
+    name: hostname
+    state: present
+    value: "{{ instance_hostname }}"
+  sudo: true
+  when: instance_hostname is defined
+
+- name: Bump kernel maxfiles
+  sysrc:
+    name: "{{ item }}"
+    state: present
+    value: 65536
+    dest: /boot/loader.conf
+  sudo: true
+  with_items:
+    - kern.maxfiles
+    - kern.maxfilesperproc
+
+- name: Bump kernel maxconn
+  sysrc:
+    name: kern.ipc.somaxconn
+    state: present
+    value: 2048
+    dest: /boot/loader.conf
+  sudo: true
+
+- name: Install misc utils
+  pkgng: name={{ item }} state=present
+  sudo: true
+  with_items:
+    - htop
+    - curl
+    - tmux
+    - vim-lite
+    - unzip
+
+- name: Install bash shell
+  pkgng: name=bash state=present
+  sudo: true

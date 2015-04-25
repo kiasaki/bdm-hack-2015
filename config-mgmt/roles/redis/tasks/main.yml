@@ -1,0 +1,36 @@
+---
+
+- name: Install redis
+  pkgng: name=databases/redis state=present
+  sudo: true
+
+- name: Enable redis at startup
+  sysrc:
+    name: redis_enable
+    state: present
+    value: "YES"
+  sudo: true
+
+- name: Copy redis configuration over
+  template:
+    src: redis.conf.j2
+    dest: /usr/local/etc/redis.conf
+    owner: root
+    mode: 0644
+  sudo: true
+
+- name: Kernel, overcommit memory enable
+  sysrc:
+    name: vm.overcommit_memory
+    state: present
+    value: 1
+    dest: /boot/loader.conf
+  sudo: true
+
+- name: Create redis working dir
+  file: path=/data/redis state=directory owner=redis
+  sudo: true
+
+- name: Start redis
+  service: name=redis state=started
+  sudo: true

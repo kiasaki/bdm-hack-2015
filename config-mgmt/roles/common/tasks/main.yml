@@ -1,0 +1,45 @@
+- include: freebsd.yml
+
+- set_fact:
+    sudo_group: wheel
+    sudoers_file: /usr/local/etc/sudoers
+
+- name: Find out bash location
+  shell: /usr/bin/which bash
+  register: shell_location
+
+- name: Ensure operator user group exists
+  group: name=op state=present
+  sudo: true
+
+- name: Ensure operator user exists
+  user: >
+    name=op
+    generate_ssh_key=yes
+    ssh_key_bits=2048
+    ssh_key_file=.ssh/id_rsa
+    shell={{ shell_location.stdout }}
+    group=op
+    groups={{ sudo_group }}
+    state=present
+  sudo: true
+
+- name: Ensure oprator user is in /etc/sudoers (Ubuntu)
+  lineinfile: "dest={{ sudoers_file }} state=present regexp='^%{{ sudo_group }}' line='%{{ sudo_group }} ALL=(ALL) NOPASSWD: ALL'"
+  sudo: true
+
+- name: Bash rofile for operator user
+  copy: src=profile dest=/home/op/.bash_profile owner=op group=op
+  sudo: true
+
+- name: Add authorized key to operator user
+  authorized_key: user=op key="{{ lookup('file', 'key.pub') }}"
+  sudo: true
+
+- name: Put logo instead of /etc/motd
+  copy: src=motd dest=/etc/motd
+  sudo: true
+
+- name: Copy over better sshd config
+  copy: src=sshd_config dest=/etc/ssh/sshd_config
+  sudo: true

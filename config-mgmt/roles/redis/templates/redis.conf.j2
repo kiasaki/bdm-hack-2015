@@ -1,0 +1,51 @@
+################################ GENERAL  #####################################
+daemonize yes
+# pid file location
+pidfile /var/run/redis/redis.pid
+# accept connections on the specified port
+port 6379
+# TCP listen() backlog
+tcp-backlog 511
+# address to bind
+bind 0.0.0.0
+# Close the connection after a client is idle for N seconds (0 to disable)
+timeout 0
+# TCP keepalive
+tcp-keepalive 0
+# log level (debug, verbose, notice, warning)
+loglevel notice
+# logfile path
+logfile /var/log/redis/redis.log
+# database count
+databases 16
+
+################################ SNAPSHOTTING  ################################
+save 900 1
+save 300 10
+save 60 10000
+# if latest dump failed, stop writes
+stop-writes-on-bgsave-error yes
+# compress dumps with lzf
+rdbcompression yes
+# checksum dumps (10% perf hit)
+rdbchecksum yes
+# filename of dump
+dbfilename dump.rdb
+#
+appendonly yes
+appendfsync everysec
+# data dir
+dir /data/redis
+
+################################## SECURITY ###################################
+# require users to AUTH
+requirepass {{ redis_password }}
+# remove dangerous commands
+rename-command FLUSHALL ""
+rename-command FLUSHDB ""
+rename-command CONFIG ""
+
+################################### LIMITS ####################################
+# max clients connected
+maxclients 10000
+

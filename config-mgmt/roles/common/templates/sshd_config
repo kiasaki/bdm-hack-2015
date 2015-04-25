@@ -1,0 +1,38 @@
+# basics
+Port 22
+ListenAddress ::
+ListenAddress 0.0.0.0
+Protocol 2
+UsePrivilegeSeparation yes
+
+# authentication
+LoginGraceTime 60
+PermitRootLogin no
+PermitEmptyPasswords no
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+StrictModes yes
+UsePAM yes
+
+RSAAuthentication yes
+PubkeyAuthentication yes
+
+# auth whitelist
+AllowUsers freebsd root ubuntu op
+
+# no tunneling connections
+AllowTcpForwarding no
+X11Forwarding no
+
+# don't show any banner
+Banner none
+PrintMotd no
+PrintLastLog yes
+
+# sftp
+Subsystem sftp /usr/lib/openssh/sftp-server
+
+# disable root login
+PermitRootLogin without-password
+Match User root
+        ForceCommand echo "No login as root"

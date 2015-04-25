@@ -1,0 +1,24 @@
+---
+
+- name: Install nginx
+  pkgng: name=nginx-devel-1.7.12 state=present
+  sudo: true
+
+- name: Enable redis at startup
+  sysrc:
+    name: nginx_enable
+    state: present
+    value: "YES"
+  sudo: true
+
+- name: Create site configutations directory
+  file: path=/usr/local/etc/nginx/conf.d state=directory owner=root group=wheel
+  sudo: true
+
+- name: Copy nginx configuration over
+  template:
+    src: nginx.conf.j2
+    dest: /usr/local/etc/nginx/nginx.conf
+    owner: root
+    mode: 0644
+  sudo: true
