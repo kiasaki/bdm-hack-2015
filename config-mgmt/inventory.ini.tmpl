@@ -1,13 +1,21 @@
 [bsd:children]
 bdmhack-workbench
 bdmhack-database
+bdmhack-producer
 
 [bdmhack-workbench]
-workbench.bdmhack ansible_ssh_host={workbench}
+workbench.bdmhack ansible_hostname=workbench.bdmhack ansible_ssh_host={workbench}
 
 [bdmhack-database]
-database1.bdmhack ansible_ssh_host={database1}
-database2.bdmhack ansible_ssh_host={database2}
-database3.bdmhack ansible_ssh_host={database3}
-database4.bdmhack ansible_ssh_host={database4}
-database5.bdmhack ansible_ssh_host={database5}
+database1.bdmhack ansible_hostname=database1.bdmhack ansible_ssh_host={database1}
+database2.bdmhack ansible_hostname=database2.bdmhack ansible_ssh_host={database2}
+database3.bdmhack ansible_hostname=database3.bdmhack ansible_ssh_host={database3}
+database4.bdmhack ansible_hostname=database4.bdmhack ansible_ssh_host={database4}
+database5.bdmhack ansible_hostname=database5.bdmhack ansible_ssh_host={database5}
+
+[bdmhack-producer]
+producer1.bdmhack ansible_hostname=producer1.bdmhack ansible_ssh_host={producer1}
+producer2.bdmhack ansible_hostname=producer2.bdmhack ansible_ssh_host={producer2}
+producer3.bdmhack ansible_hostname=producer3.bdmhack ansible_ssh_host={producer3}
+producer4.bdmhack ansible_hostname=producer4.bdmhack ansible_ssh_host={producer4}
+producer5.bdmhack ansible_hostname=producer5.bdmhack ansible_ssh_host={producer5}

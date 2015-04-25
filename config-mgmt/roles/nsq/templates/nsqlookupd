@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# PROVIDE: nsqlookupd
+# REQUIRE: LOGIN
+# BEFORE:  securelevel
+# KEYWORD: shutdown
+
+# Add the following line to /etc/rc.conf to enable `nsqlookupd':
+#
+#nsqlookupd_enable="YES"
+
+. /etc/rc.subr
+
+name="nsqlookupd"
+rcvar="${name}_enable"
+
+command="/usr/local/bin/${name}"
+pidfile="/var/run/nsq/${name}.pid"
+
+load_rc_config "$name"
+: ${nsqlookupd_enable="NO"}
+
+run_rc_command "$1"

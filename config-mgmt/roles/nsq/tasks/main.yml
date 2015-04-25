@@ -1,0 +1,25 @@
+# nsq
+#
+# Installs bitly/nsq binaries
+---
+
+- name: Fetch nsq binaries
+  shell: "curl -o /usr/local/bin/{{ item }} {{ nsq_bins_root }}/{{ item }} && chmod +x /usr/local/bin/{{ item }}"
+  with_items:
+    - nsqd
+    - nsqlookupd
+    - nsqadmin
+  sudo: true
+
+- name: Copy nsq rc.d scripts
+  template:
+    src: "{{ item }}"
+    dest: "/usr/local/etc/rc.d/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0644
+  with_items:
+    - nsqd
+    - nsqlookupd
+    - nsqadmin
+  sudo: true

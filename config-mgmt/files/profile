@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+EDITOR=vim; export EDITOR
+PAGER=more; export PAGER
+
+# some useful aliases
+alias h='fc -l'
+alias j=jobs
+alias m=$PAGER
+alias ll='ls -laFGo'
+alias l='ls -lFG'
+
+# be paranoid
+alias cp='cp -ip'
+alias mv='mv -i'
+alias rm='rm -i'
+
+# set prompt: ``username - hostname $ ''
+PS1="\[\e[0;35m\]`whoami`\[\e[0;37m\] - \[\e[0;33m\]`hostname | sed 's/\..*//'` \[\e[0m\]"
+case `id -u` in
+      0) PS1="${PS1}# ";;
+      *) PS1="${PS1}$ ";;
+esac
+
+# search path for cd(1)
+CDPATH=:$HOME

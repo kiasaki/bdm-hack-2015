@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# PROVIDE: nsqadmin
+# REQUIRE: LOGIN
+# BEFORE:  securelevel
+# KEYWORD: shutdown
+
+# Add the following line to /etc/rc.conf to enable `nsqadmin':
+#
+#nsqadmin_enable="YES"
+
+. /etc/rc.subr
+
+name="nsqadmin"
+rcvar="${name}_enable"
+
+command="/usr/local/bin/${name}"
+pidfile="/var/run/nsq/${name}.pid"
+command_args="--lookupd-http-address={{ nsqlookupd_address }}:4161"
+
+load_rc_config "$name"
+: ${nsqadmin_enable="NO"}
+
+run_rc_command "$1"

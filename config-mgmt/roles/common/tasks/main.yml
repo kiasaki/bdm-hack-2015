@@ -24,12 +24,16 @@
     state=present
   sudo: true
 
-- name: Ensure oprator user is in /etc/sudoers (Ubuntu)
+- name: Ensure oprator user is in /etc/sudoers
   lineinfile: "dest={{ sudoers_file }} state=present regexp='^%{{ sudo_group }}' line='%{{ sudo_group }} ALL=(ALL) NOPASSWD: ALL'"
   sudo: true
 
-- name: Bash rofile for operator user
-  copy: src=profile dest=/home/op/.bash_profile owner=op group=op
+- name: Bash profile for operator user
+  copy: src=files/profile dest=/home/op/.bash_profile owner=op group=op
+  sudo: true
+
+- name: Tmux config for operator user
+  copy: src=files/tmux.conf dest=/home/op/.tmux.conf owner=op group=op
   sudo: true
 
 - name: Add authorized key to operator user
@@ -41,5 +45,5 @@
   sudo: true
 
 - name: Copy over better sshd config
-  copy: src=sshd_config dest=/etc/ssh/sshd_config
+  template: src=sshd_config dest=/etc/ssh/sshd_config
   sudo: true

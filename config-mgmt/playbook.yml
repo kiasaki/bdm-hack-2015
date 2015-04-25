@@ -3,9 +3,19 @@
     - instance_hostname: "{{ ansible_hostname }}"
   roles:
     - common
+    - golang
 
 - hosts: bdmhack-workbench
   tasks:
     - name: Install jq
       pkgng: name=jq state=present
       sudo: true
+
+- hosts: bdmhack-producer
+  vars:
+    nsqlookupd_address: "{{ hostvars['workbench.bdmhack']['ansible_ssh_host'] }}"
+  roles:
+    - golang
+    - nsq
+
+

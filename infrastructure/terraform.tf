@@ -22,11 +22,20 @@ resource "digitalocean_droplet" "workbench" {
 
 resource "digitalocean_droplet" "database" {
   image = "freebsd-10-1-x64"
-  name = "database.${count.index+1}.bdmhack"
+  name = "database${count.index+1}.bdmhack"
   region = "nyc3"
-  size = "2gb"
+  size = "4gb"
   ssh_keys = ["${digitalocean_ssh_key.default.id}"]
   count = 5
+}
+
+resource "digitalocean_droplet" "producer" {
+  image = "freebsd-10-1-x64"
+  name = "producer${count.index+1}.bdmhack"
+  region = "nyc3"
+  size = "1gb"
+  ssh_keys = ["${digitalocean_ssh_key.default.id}"]
+  count = 10
 }
 
 output "workbench" {
@@ -47,4 +56,20 @@ output "database4" {
 }
 output "database5" {
   value = "${digitalocean_droplet.database.4.ipv4_address}"
+}
+
+output "producer1" {
+  value = "${digitalocean_droplet.producer.0.ipv4_address}"
+}
+output "producer2" {
+  value = "${digitalocean_droplet.producer.1.ipv4_address}"
+}
+output "producer3" {
+  value = "${digitalocean_droplet.producer.2.ipv4_address}"
+}
+output "producer4" {
+  value = "${digitalocean_droplet.producer.3.ipv4_address}"
+}
+output "producer5" {
+  value = "${digitalocean_droplet.producer.4.ipv4_address}"
 }

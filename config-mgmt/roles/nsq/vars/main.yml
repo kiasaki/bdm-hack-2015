@@ -1,0 +1,2 @@
+nsq_version: "0.3.2"
+nsq_bins_root: "http://bhinz.s3-website-us-east-1.amazonaws.com/freebsd/nsq/{{ nsq_version }}"

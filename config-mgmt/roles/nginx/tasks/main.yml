@@ -4,7 +4,7 @@
   pkgng: name=nginx-devel-1.7.12 state=present
   sudo: true
 
-- name: Enable redis at startup
+- name: Enable nginx at startup
   sysrc:
     name: nginx_enable
     state: present

@@ -1,0 +1,33 @@
+# golang
+#
+# Installs Go and gpm on a freebsd system
+---
+
+- name: Install Go from ports
+  pkgng: name=lang/go state=present
+  sudo: true
+
+- name: Install Git, Mercurial, Bazar and SVN for go get
+  pkgng: name={{ item }} state=present
+  with_items:
+    - git-2.3.6
+    - subversion-1.8.13
+    - bzr-2.6.0
+    - mercurial-3.3.3
+  sudo: true
+
+- name: Create GOPATH directory
+  file: path=/usr/home/op/go state=directory owner=op group=op
+  sudo: true
+
+- name: Write GOROOT to .bash_profile
+  lineinfile: "dest=/usr/home/op/.bash_profile state=present regexp='^GOROOT' line='GOROOT=/usr/local/go; export GOROOT'"
+  sudo: true
+
+- name: Write GOPATH to .bash_profile
+  lineinfile: "dest=/usr/home/op/.bash_profile state=present regexp='^GOPATH' line='GOPATH=/usr/home/op/go; export GOPATH'"
+  sudo: true
+
+- name: Install gpm
+  shell: "curl -o gpm https://raw.githubusercontent.com/pote/gpm/v1.3.2/bin/gpm && chmod +x gpm && sudo mv gpm /usr/local/bin"
+  sudo: true
