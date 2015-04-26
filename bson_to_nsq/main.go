@@ -6,16 +6,16 @@ import (
 	"io"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/bitly/go-nsq"
-	"github.com/kiasaki/batbelt/bson"
-	"github.com/kiasaki/bdm-hack-2015/data"
+	"github.com/kiasaki/batbelt/bsonutil"
 	"github.com/kiasaki/bdm-hack-2015/pool"
 )
 
 var fileLocation = flag.String("file", "", "location of bson dump to import")
 var nsqTopic = flag.String("nsq-topic", "", "nsq topic to produce to")
-var nsqHosts = flag.String("nsq-hosts", "127.0.0.1:4060", "nsqd hosts to produce to, comma separated")
+var nsqHosts = flag.String("nsq-hosts", "127.0.0.1:4150", "nsqd hosts to produce to, comma separated")
 
 func acquireFileHandle(location string) *os.File {
 	if location == "" {
@@ -34,25 +34,6 @@ func acquireFileHandle(location string) *os.File {
 	return fileHandle
 }
 
-func clearTypeTable(dbSession *mgo.Session, importType string) {
-	var collection string
-	if importType == "user" {
-		collection = "users"
-	} else if importType == "business" {
-		collection = "businesses"
-	} else if importType == "review" {
-		collection = "reviews"
-	} else {
-		fmt.Println("Import type didn't match user, business or review")
-		os.Exit(1)
-	}
-	// Empty db
-	if _, err := dbSession.DB("").C(collection).RemoveAll(nil); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-}
-
 func handleFatalError(err error) {
 	if err != nil {
 		fmt.Println(err)
@@ -63,16 +44,14 @@ func handleFatalError(err error) {
 func main() {
 	flag.Parse()
 
-	dbSession := dialMongo(*dbUrl)
 	reader := acquireFileHandle(*fileLocation)
 	defer reader.Close()
 	bsonStream := bsonutil.NewBSONStream(reader)
-	clearTypeTable(dbSession, *importType)
 
 	mu := sync.Mutex{}
 	nsqdHostCount := 0
-	nsqdHosts := strings.Split(*nsqdHosts, ",")
-	factory := func() (net.Conn, error) {
+	nsqdHosts := strings.Split(*nsqHosts, ",")
+	factory := func() (pool.Stoppable, error) {
 		host := nsqdHosts[nsqdHostCount%len(nsqdHosts)]
 		mu.Lock()
 		nsqdHostCount += 1
@@ -80,6 +59,10 @@ func main() {
 		return nsq.NewProducer(host, nsq.NewConfig())
 	}
 	nsqPool, err := pool.NewChannelPool(5, 30, factory)
+	if err != nil {
+		fmt.Printf("Error creating nsq producer pool: %s\n", err.Error())
+		os.Exit(1)
+	}
 	defer nsqPool.Close()
 
 	i := 0
@@ -91,7 +74,7 @@ func main() {
 
 	// document reader
 	go func() {
-		docBytes := make([]byte, bson.MaxBSONSize)
+		docBytes := make([]byte, bsonutil.MaxBSONSize)
 		for {
 			select {
 			case <-lineRequestChan:
@@ -102,7 +85,7 @@ func main() {
 					errChannel <- io.EOF
 					break
 				} else {
-					lineFeedChan <- docBytes[o:docSize]
+					lineFeedChan <- docBytes[0:docSize]
 				}
 			}
 		}
@@ -119,16 +102,18 @@ func main() {
 				producer, err := nsqPool.Get()
 				if err != nil {
 					errChannel <- err
+					producer.Stop()
 					break
 				}
 
-				producer.Publish(*nsqTopic)
-
-				if err = data.Save(workerSession.DB(""), model); err != nil {
+				err = producer.(*pool.PoolConn).Stoppable.(*nsq.Producer).Publish(*nsqTopic, line)
+				if err != nil {
 					errChannel <- err
+					producer.Stop()
 					break
 				}
 
+				producer.Stop()
 				fan <- true
 			}
 		}()

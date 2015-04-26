@@ -3,7 +3,6 @@ package pool
 
 import (
 	"errors"
-	"net"
 )
 
 var (

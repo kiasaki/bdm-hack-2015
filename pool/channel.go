@@ -96,7 +96,8 @@ func (c *channelPool) put(conn Stoppable) error {
 
 	if c.conns == nil {
 		// pool is closed, close passed connection
-		return conn.Close()
+		conn.Stop()
+		return nil
 	}
 
 	// put the resource back into the pool. If the pool is full, this will
@@ -106,7 +107,8 @@ func (c *channelPool) put(conn Stoppable) error {
 		return nil
 	default:
 		// pool is full, close passed connection
-		return conn.Close()
+		conn.Stop()
+		return nil
 	}
 }
 
@@ -123,7 +125,7 @@ func (c *channelPool) Close() {
 
 	close(conns)
 	for conn := range conns {
-		conn.Close()
+		conn.Stop()
 	}
 }
 

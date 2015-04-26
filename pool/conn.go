@@ -11,12 +11,13 @@ type PoolConn struct {
 // Close() puts the given connects back to the pool instead of closing it.
 func (p PoolConn) Close() error {
 	if p.unusable {
-		if p.Conn != nil {
-			return p.Conn.Close()
+		if p.Stoppable != nil {
+			p.Stoppable.Stop()
+			return nil
 		}
 		return nil
 	}
-	return p.c.put(p.Conn)
+	return p.c.put(p.Stoppable)
 }
 
 // MarkUnusable() marks the connection not usable any more, to let the pool close it instead of returning it to pool.
@@ -27,6 +28,6 @@ func (p *PoolConn) MarkUnusable() {
 // newConn wraps a standard Stoppable to a poolConn Stoppable.
 func (c *channelPool) wrapConn(conn Stoppable) Stoppable {
 	p := &PoolConn{c: c}
-	p.Conn = conn
+	p.Stoppable = conn
 	return p
 }
