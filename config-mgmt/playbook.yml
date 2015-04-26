@@ -7,9 +7,17 @@
 - hosts: bdmhack-workbench
   vars:
     nsqlookupd_address: "{{ hostvars['workbench.bdmhack']['ansible_ssh_host'] }}"
+    riak_nodes:
+      - "{{ hostvars['database1.bdmhack']['ansible_ssh_host'] }}:8089"
+      - "{{ hostvars['database2.bdmhack']['ansible_ssh_host'] }}:8089"
+      - "{{ hostvars['database3.bdmhack']['ansible_ssh_host'] }}:8089"
+      - "{{ hostvars['database4.bdmhack']['ansible_ssh_host'] }}:8089"
+      - "{{ hostvars['database5.bdmhack']['ansible_ssh_host'] }}:8089"
   roles:
     - golang
     - nsq
+    - nginx
+    - riak-nginx-lbproxy
   tasks:
     - name: Install jq
       pkgng: name=jq state=present
@@ -32,4 +40,8 @@
       sysrc: name=nsqd_enable state=present value=YES
       sudo: true
 
-
+- hosts: bdmhack-database
+  vars:
+    riak_nodename: "riak@{{ ansible_ssh_host }}"
+  roles:
+    - riak

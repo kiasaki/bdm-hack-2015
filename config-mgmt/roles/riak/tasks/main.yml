@@ -1,0 +1,29 @@
+# riak
+#
+# Installs raik on a node and configures it
+---
+
+- name: Check if riak is present
+  shell: "which riak"
+  register: riak_check
+  ignore_errors: true
+
+- name: Install riak from official package
+  shell: "pkg add {{ riak_package_url }}"
+  when: riak_check.rc == 1
+  sudo: true
+
+- name: Enable riak at startup
+  sysrc:
+    name: riak_enable
+    state: present
+    value: "YES"
+  sudo: true
+
+- name: Copy riak configuration over
+  template:
+    src: riak.conf.j2
+    dest: /usr/local/etc/riak/riak.conf
+    owner: root
+    mode: 0644
+  sudo: true

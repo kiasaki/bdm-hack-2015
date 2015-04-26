@@ -1,0 +1,2 @@
+riak_ring_size: 32
+riak_nodename: "riak@127.0.0.1"

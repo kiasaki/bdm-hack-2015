@@ -1,0 +1,22 @@
+# riak-nginx-lbproxy
+#
+# REQUIRES: nginx
+# VARIABLES: riak_nodes [string]
+#
+# Adds a nginx server proxing to a set of riak nodes
+# Listens on port 8089
+
+---
+
+- name: Copy riak lb proxy configuration over
+  template:
+    src: riak-lbproxy.conf.j2
+    dest: /usr/local/etc/nginx/conf.d/riak-lbproxy.conf
+    owner: root
+    group: wheel
+    mode: 0644
+  sudo: true
+
+- name: Restart nginx
+  service: name=nginx state=restarted
+  sudo: true

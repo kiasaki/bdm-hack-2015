@@ -1,0 +1,36 @@
+erlang.schedulers.force_wakeup_interval = 500
+erlang.schedulers.compaction_of_load = false
+
+# Distributed cookie, same on all nodes for communication to work
+distributed_cookie = riak
+
+# [off, file, console, both]
+log.console = file
+# [debug, info, notice, warning, error, critical, alert, emergency, none]
+log.console.level = info
+# on or off
+log.syslog = off
+# enable crash logs
+log.crash = on
+
+# on or off
+dtrace = off
+
+# platform
+platform_bin_dir = /usr/local/sbin
+platform_data_dir = /usr/local/riak
+platform_etc_dir = /usr/local/etc/riak
+platform_lib_dir = /usr/local/lib/riak/lib
+platform_log_dir = /var/log/riak
+
+# addresses
+listener.http.internal = 0.0.0.0:8098
+listener.protobuf.internal = 0.0.0.0:8087
+
+# Storage backend
+# [bitcask, leveldb, memory, multi, prefix_multi]
+storage_backend = bitcask
+
+ring_size = {{ riak_ring_size }}
+
+nodename = "{{ riak_nodename }}"
