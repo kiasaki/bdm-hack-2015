@@ -15,7 +15,7 @@ name="nsqd"
 rcvar="${name}_enable"
 
 command="/usr/local/bin/${name}"
-command_args="--lookupd-tcp-address={{ nsqlookupd_address }}:4160"
+command_args="--lookupd-tcp-address={{ nsqlookupd_address }}:4160 --data-path=/data/nsqd"
 
 start_cmd="/usr/sbin/daemon -f -u op -c $command $command_args"
 

@@ -7,11 +7,15 @@
   get_url:
     dest: "/usr/local/bin/{{ item }}"
     url: "{{ nsq_bins_root }}/{{ item }}"
-    mode: 755
+    mode: 0755
   with_items:
     - nsqd
     - nsqlookupd
     - nsqadmin
+  sudo: true
+
+- name: Ensure data directory
+  file: path=/data/nsqd state=directory owner=op
   sudo: true
 
 - name: Copy nsq rc.d scripts
