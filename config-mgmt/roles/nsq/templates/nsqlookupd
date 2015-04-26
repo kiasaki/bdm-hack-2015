@@ -15,7 +15,8 @@ name="nsqlookupd"
 rcvar="${name}_enable"
 
 command="/usr/local/bin/${name}"
-pidfile="/var/run/nsq/${name}.pid"
+
+start_cmd="/usr/sbin/daemon -f -u op -c $command"
 
 load_rc_config "$name"
 : ${nsqlookupd_enable="NO"}

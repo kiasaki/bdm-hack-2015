@@ -2,7 +2,7 @@
 
 # PROVIDE: nsqd
 # REQUIRE: LOGIN
-# BEFORE:  securelevel
+# BEFORE:  networking
 # KEYWORD: shutdown
 
 # Add the following line to /etc/rc.conf to enable `nsqd':
@@ -14,11 +14,10 @@
 name="nsqd"
 rcvar="${name}_enable"
 
-#extra_commands="reload"
-
 command="/usr/local/bin/${name}"
-pidfile="/var/run/nsq/${name}.pid"
 command_args="--lookupd-tcp-address={{ nsqlookupd_address }}:4160"
+
+start_cmd="/usr/sbin/daemon -f -u op -c $command $command_args"
 
 load_rc_config "$name"
 : ${nsqd_enable="NO"}

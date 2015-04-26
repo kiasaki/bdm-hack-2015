@@ -4,7 +4,10 @@
 ---
 
 - name: Fetch nsq binaries
-  shell: "curl -o /usr/local/bin/{{ item }} {{ nsq_bins_root }}/{{ item }} && chmod +x /usr/local/bin/{{ item }}"
+  get_url:
+    dest: "/usr/local/bin/{{ item }}"
+    url: "{{ nsq_bins_root }}/{{ item }}"
+    mode: 755
   with_items:
     - nsqd
     - nsqlookupd
@@ -17,7 +20,7 @@
     dest: "/usr/local/etc/rc.d/{{ item }}"
     owner: root
     group: wheel
-    mode: 0644
+    mode: 0755
   with_items:
     - nsqd
     - nsqlookupd
