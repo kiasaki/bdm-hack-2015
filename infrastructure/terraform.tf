@@ -73,3 +73,18 @@ output "producer4" {
 output "producer5" {
   value = "${digitalocean_droplet.producer.4.ipv4_address}"
 }
+output "producer6" {
+  value = "${digitalocean_droplet.producer.5.ipv4_address}"
+}
+output "producer7" {
+  value = "${digitalocean_droplet.producer.6.ipv4_address}"
+}
+output "producer8" {
+  value = "${digitalocean_droplet.producer.7.ipv4_address}"
+}
+output "producer9" {
+  value = "${digitalocean_droplet.producer.8.ipv4_address}"
+}
+output "producer10" {
+  value = "${digitalocean_droplet.producer.9.ipv4_address}"
+}

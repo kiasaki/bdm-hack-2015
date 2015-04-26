@@ -6,9 +6,17 @@
     - golang
 
 - hosts: bdmhack-workbench
+  vars:
+    nsqlookupd_address: "{{ hostvars['workbench.bdmhack']['ansible_ssh_host'] }}"
   tasks:
     - name: Install jq
       pkgng: name=jq state=present
+      sudo: true
+    - name: Enable nsqlookupd at startup
+      sysrc: name=nsqlookupd_enable state=present value=YES
+      sudo: true
+    - name: Enable nsqadmin at startup
+      sysrc: name=nsqadmin_enable state=present value=YES
       sudo: true
 
 - hosts: bdmhack-producer
@@ -17,5 +25,9 @@
   roles:
     - golang
     - nsq
+  tasks:
+    - name: Enable nsqd at startup
+      sysrc: name=nsqd_enable state=present value=YES
+      sudo: true
 
 
